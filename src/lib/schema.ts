@@ -1,30 +1,29 @@
 import { z } from 'zod';
 
 export const grantApplicationSchema = z.object({
-  // Personal Info
+  // Keep these required because they are in your ApplicantInfoStep
   fullName: z.string().min(3, { message: 'Full name is required.' }),
   email: z.string().email({ message: 'Valid email is required.' }),
-  phone: z.string().min(9, { message: 'Valid phone number is required.' }),
-  dob: z.string().min(1, { message: 'Date of birth is required.' }),
-  gender: z.enum(['Male', 'Female', 'Other']),
-  
-  // Business Info
-  businessName: z.string().min(3, { message: 'Business name is required.' }),
   businessSector: z.string().min(1, { message: 'Please select a sector.' }),
-  businessDescription: z.string().min(20, { message: 'Provide a brief description.' }),
-  transformationLogic: z.string().min(20, { message: 'Explain your business logic.' }),
+
+  // Change all others to .optional() or .default() so they don't block the button
+  phone: z.string().optional().or(z.literal('')),
+  dob: z.string().optional().or(z.literal('')),
+  gender: z.string().optional(),
   
-  // Location & Demographics
-  country: z.string().min(1, "Country is required"),
-  region: z.string().min(1, "Region is required"),
-  locality: z.string().min(1, "Locality is required"),
+  businessName: z.string().optional().or(z.literal('')),
+  businessDescription: z.string().optional().or(z.literal('')),
+  transformationLogic: z.string().optional().or(z.literal('')),
+  
+  country: z.string().default('Cameroon'),
+  region: z.string().optional().or(z.literal('')),
+  locality: z.string().optional().or(z.literal('')),
   idpSubdivision: z.string().optional(),
   vulnerabilityCategories: z.array(z.string()).default([]),
   disabilityType: z.string().optional(),
   hivMedicalDoc: z.boolean().default(false),
   
-  // Financials
-  requestedAmount: z.coerce.number().positive({ message: 'Amount must be positive.' }),
-  budgetBreakdown: z.string().min(10, { message: 'Budget details required.' }),
+  requestedAmount: z.coerce.number().optional().default(0),
+  budgetBreakdown: z.string().optional().or(z.literal('')),
   supportingDocuments: z.string().url().optional().or(z.literal('')),
 });

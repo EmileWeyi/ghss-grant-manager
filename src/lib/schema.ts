@@ -1,15 +1,30 @@
-
 import { z } from 'zod';
 
 export const grantApplicationSchema = z.object({
-  applicantName: z.string().min(3, { message: 'Applicant name must be at least 3 characters.' }),
-  contactEmail: z.string().email({ message: 'Please enter a valid email address.' }),
-  organizationType: z.enum(['ngo', 'academic', 'government', 'other'], {
-    required_error: 'You need to select an organization type.',
-  }),
-  projectTitle: z.string().min(10, { message: 'Project title must be at least 10 characters.' }),
-  projectDescription: z.string().min(50, { message: 'Project description must be at least 50 characters.' }),
-  supportingDocuments: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')),
-  totalAmount: z.coerce.number({invalid_type_error: "Please enter a valid amount."}).positive({ message: 'Amount must be a positive number.' }),
-  budgetBreakdown: z.string().min(20, { message: 'Budget breakdown must be at least 20 characters.' }),
+  // Personal Info
+  fullName: z.string().min(3, { message: 'Full name is required.' }),
+  email: z.string().email({ message: 'Valid email is required.' }),
+  phone: z.string().min(9, { message: 'Valid phone number is required.' }),
+  dob: z.string().min(1, { message: 'Date of birth is required.' }),
+  gender: z.enum(['Male', 'Female', 'Other']),
+  
+  // Business Info
+  businessName: z.string().min(3, { message: 'Business name is required.' }),
+  businessSector: z.string().min(1, { message: 'Please select a sector.' }),
+  businessDescription: z.string().min(20, { message: 'Provide a brief description.' }),
+  transformationLogic: z.string().min(20, { message: 'Explain your business logic.' }),
+  
+  // Location & Demographics
+  country: z.string().min(1, "Country is required"),
+  region: z.string().min(1, "Region is required"),
+  locality: z.string().min(1, "Locality is required"),
+  idpSubdivision: z.string().optional(),
+  vulnerabilityCategories: z.array(z.string()).default([]),
+  disabilityType: z.string().optional(),
+  hivMedicalDoc: z.boolean().default(false),
+  
+  // Financials
+  requestedAmount: z.coerce.number().positive({ message: 'Amount must be positive.' }),
+  budgetBreakdown: z.string().min(10, { message: 'Budget details required.' }),
+  supportingDocuments: z.string().url().optional().or(z.literal('')),
 });

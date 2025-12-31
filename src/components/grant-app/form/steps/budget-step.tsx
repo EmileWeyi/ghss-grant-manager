@@ -1,12 +1,6 @@
 'use client';
 import { useFormContext } from 'react-hook-form';
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/hooks/use-language';
@@ -21,12 +15,12 @@ export function BudgetStep() {
     <div className="space-y-6">
       <FormField
         control={control}
-        name="totalAmount"
+        name="requestedAmount"
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between">
               <FormLabel>{t('total_amount')}</FormLabel>
-              <AiAssistant fieldName="totalAmount" formSection="totalAmount" />
+              <AiAssistant fieldName="requestedAmount" formSection="totalAmount" />
             </div>
             <FormControl>
               <Input type="number" placeholder={t('total_amount_placeholder')} {...field} />

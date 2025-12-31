@@ -1,20 +1,8 @@
 'use client';
 import { useFormContext } from 'react-hook-form';
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/hooks/use-language';
 import { AiAssistant } from '../ai-assistant';
 import type { GrantApplication } from '@/lib/types';
@@ -27,12 +15,12 @@ export function ApplicantInfoStep() {
     <div className="space-y-6">
       <FormField
         control={control}
-        name="applicantName"
+        name="fullName"
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between">
               <FormLabel>{t('applicant_name')}</FormLabel>
-              <AiAssistant fieldName="applicantName" formSection="applicantName" />
+              <AiAssistant fieldName="fullName" formSection="applicantName" />
             </div>
             <FormControl>
               <Input placeholder={t('applicant_name_placeholder')} {...field} />
@@ -43,12 +31,12 @@ export function ApplicantInfoStep() {
       />
       <FormField
         control={control}
-        name="contactEmail"
+        name="email"
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between">
               <FormLabel>{t('contact_email')}</FormLabel>
-               <AiAssistant fieldName="contactEmail" formSection="contactEmail" />
+              <AiAssistant fieldName="email" formSection="contactEmail" />
             </div>
             <FormControl>
               <Input type="email" placeholder={t('contact_email_placeholder')} {...field} />
@@ -59,12 +47,12 @@ export function ApplicantInfoStep() {
       />
       <FormField
         control={control}
-        name="organizationType"
+        name="businessSector"
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between">
                 <FormLabel>{t('organization_type')}</FormLabel>
-                <AiAssistant fieldName="organizationType" formSection="organizationType" />
+                <AiAssistant fieldName="businessSector" formSection="organizationType" />
             </div>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
@@ -73,7 +61,7 @@ export function ApplicantInfoStep() {
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="ngo">{t('org_type_ngo')}</SelectItem>
+                <SelectItem value="Agriculture or Livestock">Agriculture or Livestock</SelectItem>
                 <SelectItem value="academic">{t('org_type_academic')}</SelectItem>
                 <SelectItem value="government">{t('org_type_gov')}</SelectItem>
                 <SelectItem value="other">{t('org_type_other')}</SelectItem>

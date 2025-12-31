@@ -1,0 +1,26 @@
+{
+  "applicantName": {
+    "guidance": "Provide the full legal name of the organization or individual applying for the grant. This should match official registration documents."
+  },
+  "contactEmail": {
+    "guidance": "Use a professional email address that is checked regularly, as this will be the primary point of contact for all communications regarding the application."
+  },
+  "organizationType": {
+    "guidance": "Select the category that best describes your organization's legal status."
+  },
+  "projectTitle": {
+    "guidance": "Create a concise, descriptive, and compelling title for your project. It should capture the essence of your proposal in a few words."
+  },
+  "projectDescription": {
+    "guidance": "Describe the project's main objectives, key activities, target population, and expected outcomes. The description should be between 200 and 500 words and clearly articulate the problem and your proposed solution."
+  },
+  "supportingDocuments": {
+    "guidance": "Provide a single, publicly accessible URL to a document (e.g., PDF) containing any supplementary materials, such as project proposals, logical frameworks, or letters of support."
+  },
+  "totalAmount": {
+    "guidance": "Enter the total grant amount requested in US Dollars. This figure should be the sum of all expenses detailed in the budget breakdown."
+  },
+  "budgetBreakdown": {
+    "guidance": "Provide a detailed breakdown of how the grant funds will be utilized. List major expense categories (e.g., personnel, travel, equipment, supplies) and the amount allocated to each. Ensure the total matches the 'Total Amount Requested'."
+  }
+}

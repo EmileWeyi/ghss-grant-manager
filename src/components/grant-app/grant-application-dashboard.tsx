@@ -17,18 +17,23 @@ export function GrantApplicationDashboard() {
   });
 
   const onSubmit = async (data: { fullName: string }) => {
+    console.log("1. Button clicked. Data:", data);
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, 'applications'), {
+      console.log("2. Attempting Firebase write...");
+      const docRef = await addDoc(collection(db, 'applications'), {
         fullName: data.fullName,
         test: true,
         submittedAt: serverTimestamp(),
       });
-      alert("Success! The connection is fixed!");
+      console.log("3. Success! ID:", docRef.id);
+      alert("Success! ID: " + docRef.id);
     } catch (e: any) {
+      console.error("4. Caught Error:", e);
       alert("Error: " + e.message);
     } finally {
       setIsSubmitting(false);
+      console.log("5. Submitting state reset.");
     }
   };
 

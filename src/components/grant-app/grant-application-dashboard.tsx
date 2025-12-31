@@ -11,8 +11,6 @@ import { Loader2 } from 'lucide-react';
 
 export function GrantApplicationDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [debugMessage, setDebugMessage] = useState('');
-
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(grantApplicationSchema),
     defaultValues: { fullName: '' }
@@ -20,45 +18,30 @@ export function GrantApplicationDashboard() {
 
   const onSubmit = async (data: { fullName: string }) => {
     setIsSubmitting(true);
-    setDebugMessage('Connecting to Firebase...');
     try {
-      const docRef = await addDoc(collection(db, 'applications'), {
+      await addDoc(collection(db, 'applications'), {
         fullName: data.fullName,
-        testMode: true,
+        test: true,
         submittedAt: serverTimestamp(),
       });
-      setDebugMessage(`✅ Success! ID: ${docRef.id}`);
-      alert("Success! Check Firestore!");
-    } catch (error: any) {
-      console.error(error);
-      setDebugMessage(`❌ Error: ${error.message}`);
+      alert("Success! The connection is fixed!");
+    } catch (e: any) {
+      alert("Error: " + e.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="p-8 max-w-md mx-auto space-y-4 border rounded-lg bg-white shadow">
-      <h1 className="text-xl font-bold text-center">Connection Test</h1>
-      
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="text-sm font-medium">Full Name</label>
-          <Input {...register('fullName')} placeholder="Enter test name" />
-          {errors.fullName && <p className="text-red-500 text-xs">{errors.fullName.message}</p>}
-        </div>
-
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isSubmitting ? 'Sending...' : 'Test Firebase Connection'}
+    <div className="p-20 bg-white min-h-screen">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-sm mx-auto space-y-4">
+        <h1 className="text-2xl font-bold">Reset Test</h1>
+        <p>If you see other questions, the code hasn't updated yet.</p>
+        <Input {...register('fullName')} placeholder="Type your name" />
+        <Button type="submit" disabled={isSubmitting} className="w-full">
+          {isSubmitting ? <Loader2 className="animate-spin" /> : "Test This One Button"}
         </Button>
       </form>
-
-      {debugMessage && (
-        <p className="p-2 text-xs bg-slate-100 rounded text-center font-mono">
-          {debugMessage}
-        </p>
-      )}
     </div>
   );
 }

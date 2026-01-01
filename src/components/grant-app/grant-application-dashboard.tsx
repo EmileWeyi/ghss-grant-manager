@@ -34,23 +34,30 @@ export function GrantApplicationDashboard() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm({
     resolver: zodResolver(grantApplicationSchema),
     defaultValues: { 
-      fullName: '', email: '', phoneCode: '+237', phoneNumber: '',
-      gender: '', dob: '', region: '', locality: '', vulnerabilities: [] 
+      fullName: '', 
+      email: '', 
+      phoneCode: '+237', 
+      phoneNumber: '',
+      gender: '', 
+      dob: '', 
+      region: '', 
+      locality: '', 
+      vulnerabilities: [], // Build needs this to be an empty array
+      displacedFrom: '',
+      countryOfOrigin: ''
     }
   });
 
-  // Watch the vulnerability checkboxes so we can show/hide extra questions
+  // This line is what caused the build to fail if 'vulnerabilities' wasn't in defaultValues
   const selectedVulnerabilities = watch("vulnerabilities") || [];
 
   // --- SUBMIT LOGIC ---
   const onSubmit = async (data: any) => {
-    // 1. Calculate Age
     const birthDate = new Date(data.dob);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     if (today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())) { age--; }
 
-    // 2. Security Check (18-35)
     if (age < 18 || age > 35) {
       alert("Error: Age must be 18-35.");
       return;
@@ -58,7 +65,6 @@ export function GrantApplicationDashboard() {
 
     setIsSubmitting(true);
     try {
-      // 3. Save to Firebase (Default Database)
       const docRef = await addDoc(collection(db, 'applications'), {
         ...data,
         ageCalculated: age,
@@ -158,12 +164,12 @@ export function GrantApplicationDashboard() {
                     <span className="text-sm">{cat}</span>
                   </label>
 
-                  {/* CONDITIONAL FIELD: Only shows if IDP is checked */}
+                  {/* CONDITIONAL FIELD: IDP */}
                   {selectedVulnerabilities.includes("Internally Displaced Person (IDP)") && cat.includes("IDP") && (
                     <Input {...register("displacedFrom")} placeholder="Subdivision you were displaced from?" className="ml-6 w-11/12" />
                   )}
 
-                  {/* CONDITIONAL FIELD: Only shows if Refugee is checked */}
+                  {/* CONDITIONAL FIELD: Refugee */}
                   {selectedVulnerabilities.includes("Refugee") && cat.includes("Refugee") && (
                     <Input {...register("countryOfOrigin")} placeholder="Country of Origin" className="ml-6 w-11/12" />
                   )}
@@ -179,3 +185,4 @@ export function GrantApplicationDashboard() {
       </div>
     </div>
   );
+}

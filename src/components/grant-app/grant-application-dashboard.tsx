@@ -22,6 +22,7 @@ export function GrantApplicationDashboard() {
   const [step] = useState(1); // Set for Step 1
 
   const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(grantApplicationSchema),
     defaultValues: { 
       fullName: '', 
       email: '', 

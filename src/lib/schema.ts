@@ -21,4 +21,15 @@ export const grantApplicationSchema = z.object({
   }),
 });
 
+// Location & Vulnerability
+region: z.string().min(1, "Please select a region"),
+locality: z.string().min(1, "Please select a locality"),
+vulnerabilities: z.array(z.string()).min(1, "Please select at least one category"),
+
+// Conditional fields (Optional in schema, but filled based on UI)
+displacedFrom: z.string().optional(),
+countryOfOrigin: z.string().optional(),
+disabilityType: z.string().optional(),
+hasHivDocs: z.string().optional(),
+
 export type GrantApplicationData = z.infer<typeof grantApplicationSchema>;

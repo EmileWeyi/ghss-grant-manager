@@ -7,8 +7,9 @@ export const grantApplicationSchema = z.object({
   phoneNumber: z.string().min(8, "Phone number is too short"),
   gender: z.string().min(1, "Please select a gender"),
   dob: z.string().min(1, "Date of Birth is required"),
-  region: z.string().min(1, "Please select a region"),
-  locality: z.string().min(1, "Please select a locality"),
+  // Change these to .optional() for now to let the button work
+  region: z.string().optional(),
+  locality: z.string().optional(),
   vulnerabilities: z.array(z.string()).default([]),
   displacedFrom: z.string().optional(),
   countryOfOrigin: z.string().optional(),

@@ -39,12 +39,18 @@ export function GrantApplicationDashboard() {
   const selectedVulnerabilities = watch("vulnerabilities") || [];
 
   const onSubmit = async (data: any) => {
-    // Only submit to Firebase on the final step (we will add more steps later)
-    if (step < 2) {
-      setStep(step + 1);
+    // 1. If we are on Step 1, we only care about Step 1 fields
+    if (step === 1) {
+      // Manual check to ensure Step 1 is filled
+      if (!data.fullName || !data.email || !data.gender || !data.dob) {
+        alert("Please fill in all fields in Step 1");
+        return;
+      }
+      setStep(2);
       return;
     }
 
+    // 2. If we are on Step 2, now we save to Firebase
     setIsSubmitting(true);
     try {
       const docRef = await addDoc(collection(db, 'applications'), {

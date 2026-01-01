@@ -9,10 +9,11 @@ export const grantApplicationSchema = z.object({
   dob: z.string().min(1, "Date of Birth is required"),
   region: z.string().min(1, "Please select a region"),
   locality: z.string().min(1, "Please select a locality"),
-  // Make sure this is an array of strings
   vulnerabilities: z.array(z.string()).default([]),
   displacedFrom: z.string().optional(),
-  countryOfOrigin: z.string().optional()
+  countryOfOrigin: z.string().optional(),
+  disabilityType: z.string().optional(),
+  hasHivDocs: z.string().optional()
 });
 
 export type GrantApplicationData = z.infer<typeof grantApplicationSchema>;

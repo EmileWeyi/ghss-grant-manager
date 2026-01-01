@@ -1,13 +1,15 @@
 import { z } from 'zod';
 
 export const grantApplicationSchema = z.object({
-  fullName: z.string().min(3, "Full name must be at least 3 characters"),
-  email: z.string().email("Invalid email address"),
-  phoneCode: z.string().default("+237"),
-  phoneNumber: z.string().min(8, "Phone number is too short"),
-  gender: z.string().min(1, "Please select a gender"),
-  dob: z.string().min(1, "Date of Birth is required"),
-  // Change these to .optional() for now to let the button work
+  // Step 1: Minimum requirements to move forward
+  fullName: z.string().min(2, "Name required"),
+  email: z.string().email("Valid email required"),
+  gender: z.string().min(1, "Select gender"),
+  dob: z.string().min(1, "Date of birth required"),
+  
+  // Step 2: Make these optional so they don't block Step 1
+  phoneCode: z.string().optional(),
+  phoneNumber: z.string().optional(),
   region: z.string().optional(),
   locality: z.string().optional(),
   vulnerabilities: z.array(z.string()).default([]),
@@ -16,5 +18,3 @@ export const grantApplicationSchema = z.object({
   disabilityType: z.string().optional(),
   hasHivDocs: z.string().optional()
 });
-
-export type GrantApplicationData = z.infer<typeof grantApplicationSchema>;

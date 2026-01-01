@@ -39,18 +39,12 @@ export function GrantApplicationDashboard() {
   const selectedVulnerabilities = watch("vulnerabilities") || [];
 
   const onSubmit = async (data: any) => {
-    // 1. If we are on Step 1, we only care about Step 1 fields
+    console.log("Validation Passed. Current Step:", step);
     if (step === 1) {
-      // Manual check to ensure Step 1 is filled
-      if (!data.fullName || !data.email || !data.gender || !data.dob) {
-        alert("Please fill in all fields in Step 1");
-        return;
-      }
       setStep(2);
       return;
     }
 
-    // 2. If we are on Step 2, now we save to Firebase
     setIsSubmitting(true);
     try {
       const docRef = await addDoc(collection(db, 'applications'), {
@@ -58,12 +52,19 @@ export function GrantApplicationDashboard() {
         status: 'SUBMITTED',
         submittedAt: serverTimestamp(),
       });
-      alert("Application Submitted Successfully! ID: " + docRef.id);
+      alert("Success! ID: " + docRef.id);
     } catch (e: any) {
-      alert("Error: " + e.message);
+      alert("Firebase Error: " + e.message);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // This runs if validation FAILS (The Secret Culprit)
+  const onInvalid = (errors: any) => {
+    console.error("Validation Errors:", errors);
+    const errorFields = Object.keys(errors).join(", ");
+    alert("Cannot continue. Please check these fields: " + errorFields);
   };
 
   return (
@@ -81,7 +82,7 @@ export function GrantApplicationDashboard() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} ...>
           
           {/* STEP 1: PERSONAL INFO */}
           {step === 1 && (

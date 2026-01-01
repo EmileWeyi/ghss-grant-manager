@@ -1,6 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod'; // <--- THIS WAS MISSING
+import { grantApplicationSchema } from '@/lib/schema';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';

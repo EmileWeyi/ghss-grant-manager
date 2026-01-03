@@ -12,8 +12,8 @@ export const grantApplicationSchema = z.object({
   vulnerabilities: z.array(z.string()).default([]),
   displacedFrom: z.string().optional(),
   countryOfOrigin: z.string().optional(),
-  disabilityType: z.string().optional(),
-  hasHivDocs: z.string().optional()
+  disabilityType: z.string().optional(), // New field for Disability dropdown
+  hasHivDocs: z.string().optional()       // New field for HIV Radio
 });
 
 export type GrantApplicationData = z.infer<typeof grantApplicationSchema>;

@@ -4,7 +4,7 @@ schemaVersion: "v1"
 runConfig:
   maxInstances: 1
 
-# This is the crucial part for GitLab IDE users
+# Add this scripts section to override the default behavior
 scripts:
   installCommand: "npm install"
 

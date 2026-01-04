@@ -1,16 +1,9 @@
-# Settings to manage and configure a Firebase App Hosting backend.
-# https://firebase.google.com/docs/app-hosting/configure
-
-kind: "AppStack"
-schemaVersion: "v1"
+kind: AppStack
+schemaVersion: v1
 runConfig:
   maxInstances: 1
 scripts:
-  installCommand: "npm install"
+  installCommand: npm install
 env:
   - variable: RESEND_API_KEY
-    value: "re_gsFfhZ9q_7a4a8bcZ8n8bdENRp6DfjNdQ"
-  - variable: GOOGLE_NODE_RUN_SCRIPTS
-    value: ""
-  - variable: NPM_CONFIG_PRODUCTION
-    value: "false"
+    value: re_gsFfhZ9q_7a4a8bcZ8n8bdENRp6DfjNdQ

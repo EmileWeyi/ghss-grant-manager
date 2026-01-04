@@ -8,7 +8,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, ChevronRight, Upload, CheckCircle, User, MapPin, Briefcase, Info, Paperclip, AlertCircle } from 'lucide-react';
+import { Loader2, ChevronRight, Upload, CheckCircle, User, MapPin, Briefcase, Info, Paperclip, AlertCircle, FileCheck } from 'lucide-react';
 
 const locationData: Record<string, string[]> = {
   "North West": ["Bamenda I", "Bamenda II", "Bamenda III", "Bambui", "Bambili", "Mbengwi Town", "Santa Urban", "Akum"],
@@ -28,22 +28,21 @@ export function GrantApplicationDashboard() {
 
   const { register, handleSubmit, watch, trigger, formState: { errors } } = useForm({
     resolver: zodResolver(grantApplicationSchema),
-    mode: "onChange", // Validates as they type
+    mode: "onChange",
     defaultValues: { 
-      fullName: '', email: '', gender: '', dob: '', region: '', locality: '',
-      vulnerabilities: [], displacedFrom: '', countryOfOrigin: '', disabilityType: '', hasHivDocs: '',
-      businessName: '', businessSector: '', businessDescription: '', transformationDetails: '',
-      fundingAmount: 250000 
+      vulnerabilities: [], fundingAmount: 250000 
     }
   });
 
   const allValues = watch(); 
   const selectedVulnerabilities = watch("vulnerabilities") || [];
-  const businessDesc = watch("businessDescription") || "";
-  const transformDesc = watch("transformationDetails") || "";
 
-  // Force validation before changing steps
   const handleNextStep = async (fields: any[], nextStep: number) => {
+    // If we are on Step 2, we allow "Continue" even if fields are empty
+    if (step === 2) {
+      setStep(nextStep);
+      return;
+    }
     const isValid = await trigger(fields);
     if (isValid) setStep(nextStep);
   };
@@ -54,7 +53,7 @@ export function GrantApplicationDashboard() {
     }
   };
 
-  const countWords = (str: string) => str.trim() === '' ? 0 : str.trim().split(/\s+/).filter(Boolean).length;
+  const countWords = (str: string) => (str || '').trim() === '' ? 0 : str.trim().split(/\s+/).filter(Boolean).length;
 
   const onFinalSubmit = async (data: any) => {
     setIsSubmitting(true);
@@ -77,37 +76,34 @@ export function GrantApplicationDashboard() {
       <div className="flex flex-col items-center justify-center min-h-screen text-center p-6 bg-white animate-in zoom-in">
         <CheckCircle className="w-20 h-20 text-green-500 mb-4" />
         <h1 className="text-3xl font-bold">Submission Received</h1>
-        <p className="text-gray-600 mt-2">GHSS team will review your application soon.</p>
+        <p className="text-gray-600 mt-2">Your application is now under review by GHSS.</p>
         <Button className="mt-8 bg-blue-600 px-10" onClick={() => window.location.reload()}>Finish</Button>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-20 bg-gray-50 min-h-screen">
-      <div className="max-w-3xl mx-auto bg-white p-6 md:p-12 rounded-3xl shadow-2xl border border-gray-100">
+    <div className="p-4 md:p-10 bg-gray-50 min-h-screen">
+      <div className="max-w-4xl mx-auto bg-white p-6 md:p-12 rounded-3xl shadow-xl border border-gray-100">
         
-        {/* PROGRESS */}
+        {/* PROGRESS BAR (1/5) */}
         <div className="mb-10">
-          <div className="flex justify-between mb-2 text-[10px] font-black uppercase text-blue-600">
-            <span>Step {step} / 6</span>
-            <span>{Math.round((step / 6) * 100)}%</span>
+          <div className="flex justify-between mb-2 text-[10px] font-black uppercase text-blue-600 tracking-widest">
+            <span>Phase {step} of 5</span>
+            <span>{Math.round((step / 5) * 100)}%</span>
           </div>
-          <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-            <div className="bg-blue-600 h-full transition-all duration-500" style={{ width: `${(step / 6) * 100}%` }}></div>
+          <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+            <div className="bg-blue-600 h-full transition-all duration-500" style={{ width: `${(step / 5) * 100}%` }}></div>
           </div>
         </div>
 
         <form onSubmit={handleSubmit(onFinalSubmit)} className="space-y-6">
           
-          {/* STEP 1: PERSONAL */}
+          {/* STEP 1/5: PERSONAL INFO */}
           {step === 1 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
               <h2 className="text-2xl font-bold flex items-center gap-2"><User className="w-6 h-6 text-blue-600"/> Personal Info</h2>
-              <div className="space-y-1">
-                <Input {...register('fullName')} placeholder="Full Name" className={errors.fullName ? "border-red-500" : ""} />
-                {errors.fullName && <p className="text-red-500 text-[10px]">Name is required</p>}
-              </div>
+              <Input {...register('fullName')} placeholder="Full Name" />
               <Input {...register('email')} placeholder="Email Address" />
               <div className="grid grid-cols-2 gap-4">
                 <select {...register('gender')} className="border rounded-xl px-3 h-12 text-sm">
@@ -117,14 +113,17 @@ export function GrantApplicationDashboard() {
                 </select>
                 <Input type="date" {...register('dob')} />
               </div>
-              <Button type="button" onClick={() => handleNextStep(['fullName', 'email', 'gender', 'dob'], 2)} className="w-full h-14 bg-blue-600 rounded-xl">Continue</Button>
+              <Button type="button" onClick={() => handleNextStep(['fullName', 'email', 'gender', 'dob'], 2)} className="w-full h-14 bg-blue-600 rounded-xl font-bold">Continue</Button>
             </div>
           )}
 
-          {/* STEP 2: LOCATION */}
+          {/* STEP 2/5: LOCATION & BACKGROUND (OPTIONAL) */}
           {step === 2 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-              <h2 className="text-2xl font-bold flex items-center gap-2"><MapPin className="w-6 h-6 text-blue-600"/> Location</h2>
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold flex items-center gap-2"><MapPin className="w-6 h-6 text-blue-600"/> Location & Background</h2>
+                <span className="text-[10px] bg-gray-100 px-2 py-1 rounded font-bold text-gray-400">OPTIONAL</span>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <select {...register("region")} onChange={(e) => setSelectedRegion(e.target.value)} className="border rounded-xl h-12 text-sm">
                   <option value="">Region</option>
@@ -136,64 +135,64 @@ export function GrantApplicationDashboard() {
                 </select>
               </div>
               <div className="space-y-3 pt-4 border-t">
-                <p className="text-xs font-bold text-blue-600 uppercase">Vulnerability Category</p>
+                <p className="text-xs font-bold text-gray-500 uppercase">Vulnerability Category</p>
                 {["Internally Displaced Person (IDP)", "Refugee", "Person Living with HIV", "Young Single Parent", "Person with Disability", "Low-income Rural Youth", "Unemployed Youth"].map(cat => (
                   <div key={cat} className="space-y-2">
                     <label className="flex items-center space-x-3 text-sm p-3 border rounded-xl cursor-pointer hover:bg-gray-50">
                       <input type="checkbox" value={cat} {...register("vulnerabilities")} className="w-4 h-4" />
                       <span>{cat}</span>
                     </label>
-                    {/* Follow-ups (Not Obligatory as requested) */}
                     {selectedVulnerabilities.includes("Internally Displaced Person (IDP)") && cat.includes("IDP") && <Input {...register("displacedFrom")} placeholder="Subdivision of origin?" className="ml-8 w-11/12" />}
                     {selectedVulnerabilities.includes("Refugee") && cat.includes("Refugee") && <Input {...register("countryOfOrigin")} placeholder="Country of origin?" className="ml-8 w-11/12" />}
-                    {selectedVulnerabilities.includes("Person Living with HIV") && cat.includes("HIV") && (
-                      <div className="ml-8 text-[10px] flex gap-4 bg-gray-50 p-2 rounded-lg">
-                        <span>Documentation?</span>
-                        <label><input type="radio" value="YES" {...register("hasHivDocs")} /> Yes</label>
-                        <label><input type="radio" value="NO" {...register("hasHivDocs")} /> No</label>
-                      </div>
+                    {selectedVulnerabilities.includes("Person with Disability") && cat.includes("Disability") && (
+                      <select {...register("disabilityType")} className="ml-8 w-11/12 border rounded-xl h-10 text-sm">
+                        <option value="">Type of Disability</option>
+                        <option value="Physical">Physical</option>
+                        <option value="Visual">Visual</option>
+                        <option value="Hearing">Hearing</option>
+                        <option value="Intellectual">Intellectual</option>
+                      </select>
                     )}
                   </div>
                 ))}
               </div>
               <div className="flex gap-4">
                 <Button type="button" onClick={() => setStep(1)} variant="outline" className="flex-1 h-12">Back</Button>
-                <Button type="button" onClick={() => handleNextStep(['region', 'locality'], 4)} className="flex-1 h-12 bg-blue-600">Continue</Button>
+                <Button type="button" onClick={() => setStep(3)} className="flex-1 h-12 bg-blue-600 text-white font-bold">Continue</Button>
               </div>
             </div>
           )}
 
-          {/* STEP 4: PROJECT DETAILS (GHSS Terminology) */}
-          {step === 4 && (
+          {/* STEP 3/5: PROJECT DETAILS */}
+          {step === 3 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
               <h2 className="text-2xl font-bold flex items-center gap-2"><Briefcase className="w-6 h-6 text-blue-600"/> Project Details</h2>
               <Input {...register('businessName')} placeholder="Business Name" />
               
               <div className="space-y-2">
-                <label className="text-sm font-bold flex justify-between">Business Description <span className={countWords(businessDesc) > 500 ? "text-red-500" : "text-gray-400"}>{countWords(businessDesc)}/500</span></label>
+                <label className="text-sm font-bold flex justify-between">Business Description <span className={countWords(allValues.businessDescription) > 500 ? "text-red-500" : "text-gray-400"}>{countWords(allValues.businessDescription)}/500</span></label>
                 <Textarea {...register('businessDescription')} placeholder="Highlight main development impact of your business/organization." className="h-32 resize-none" />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-bold flex justify-between">Production Process <span className={countWords(transformDesc) > 500 ? "text-red-500" : "text-gray-400"}>{countWords(transformDesc)}/500</span></label>
+                <label className="text-sm font-bold flex justify-between">Production Process <span className={countWords(allValues.transformationDetails) > 500 ? "text-red-500" : "text-gray-400"}>{countWords(allValues.transformationDetails)}/500</span></label>
                 <Textarea {...register('transformationDetails')} placeholder="How does your business involve transformation?" className="h-32 resize-none" />
               </div>
 
               <div className="space-y-1">
                 <label className="text-sm font-bold">Funding Requested (XAF)</label>
                 <Input type="number" {...register('fundingAmount', { valueAsNumber: true })} />
-                <p className="text-[10px] text-gray-400 uppercase">250,000 - 550,000 XAF</p>
               </div>
 
               <div className="flex gap-4">
                 <Button type="button" onClick={() => setStep(2)} variant="outline" className="flex-1 h-12">Back</Button>
-                <Button type="button" onClick={() => handleNextStep(['businessName', 'businessDescription', 'transformationDetails', 'fundingAmount'], 5)} className="flex-1 h-12 bg-blue-600">Continue</Button>
+                <Button type="button" onClick={() => handleNextStep(['businessName', 'businessDescription', 'transformationDetails', 'fundingAmount'], 4)} className="flex-1 h-12 bg-blue-600 font-bold">Continue</Button>
               </div>
             </div>
           )}
 
-          {/* STEP 5: DOCUMENTS */}
-          {step === 5 && (
+          {/* STEP 4/5: DOCUMENTS */}
+          {step === 4 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
               <h2 className="text-2xl font-bold flex items-center gap-2"><Upload className="w-6 h-6 text-blue-600"/> Document Uploads</h2>
               {[
@@ -201,7 +200,7 @@ export function GrantApplicationDashboard() {
                 { label: "Proof of Eligibility", key: "proof" },
                 { label: "CV", key: "cv" },
                 { label: "Budget Plan", key: "budget" },
-                { label: "Additional Documents", key: "extra" } // Optional
+                { label: "Additional Documents", key: "extra" }
               ].map((doc) => (
                 <div key={doc.key} className="p-4 border-2 border-dashed rounded-2xl hover:bg-blue-50 transition-all">
                   <div className="flex justify-between items-center">
@@ -213,52 +212,81 @@ export function GrantApplicationDashboard() {
                       </div>
                     </div>
                   </div>
-                  {fileNames[doc.key] && <p className="text-[10px] text-green-600 mt-2 italic font-medium tracking-tight">Attached: {fileNames[doc.key]}</p>}
+                  {fileNames[doc.key] && <p className="text-[10px] text-green-600 mt-2 font-medium italic">File: {fileNames[doc.key]}</p>}
                 </div>
               ))}
               <div className="flex gap-4 pt-4">
-                <Button type="button" onClick={() => setStep(4)} variant="outline" className="flex-1 h-12">Back</Button>
-                <Button type="button" onClick={() => setStep(6)} className="flex-1 h-12 bg-blue-600 text-white">Review Application</Button>
+                <Button type="button" onClick={() => setStep(3)} variant="outline" className="flex-1 h-12">Back</Button>
+                <Button type="button" onClick={() => setStep(5)} className="flex-1 h-12 bg-blue-600 font-bold">Review Application</Button>
               </div>
             </div>
           )}
 
-          {/* STEP 6: REVIEW */}
-          {step === 6 && (
+          {/* STEP 5/5: FULL REVIEW STAGE */}
+          {step === 5 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
-              <div className="bg-amber-50 p-4 rounded-2xl border-l-4 border-amber-400 flex gap-3">
-                <AlertCircle className="text-amber-600 w-5 h-5 flex-shrink-0" />
-                <p className="text-xs text-amber-800 font-medium">Please review all information. After submission, your file is locked for GHSS evaluation.</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div className="bg-gray-50 p-4 rounded-xl space-y-1">
-                  <h3 className="font-black text-blue-600 uppercase text-[9px]">Personal</h3>
-                  <p><strong>{allValues.fullName}</strong></p>
-                  <p className="text-gray-500">{allValues.email}</p>
-                  <p className="text-gray-500">{allValues.locality}, {allValues.region}</p>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-xl space-y-1">
-                  <h3 className="font-black text-blue-600 uppercase text-[9px]">Finance</h3>
-                  <p><strong>{allValues.businessName}</strong></p>
-                  <p className="text-blue-700 font-bold">{allValues.fundingAmount?.toLocaleString()} XAF</p>
+              <div className="bg-amber-50 p-5 rounded-2xl border-l-4 border-amber-400 flex gap-4">
+                <AlertCircle className="text-amber-600 w-6 h-6 flex-shrink-0" />
+                <div>
+                  <h3 className="text-sm font-bold text-amber-900">Final Verification</h3>
+                  <p className="text-[11px] text-amber-800">Review your entire application. By clicking submit, you certify that all information provided is accurate.</p>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <h3 className="font-black text-blue-600 uppercase text-[9px] mb-2">Business Description</h3>
-                  <p className="text-[11px] leading-relaxed text-gray-700 italic">"{allValues.businessDescription}"</p>
+              <div className="grid grid-cols-1 gap-6">
+                {/* 1. Identity Summary */}
+                <div className="border rounded-2xl p-6 bg-gray-50/50">
+                  <h3 className="text-xs font-black uppercase text-blue-600 mb-4 tracking-widest flex items-center gap-2"><User className="w-3 h-3"/> Identity & Contact</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+                    <div><p className="text-gray-400 mb-1">Full Name</p><strong>{allValues.fullName}</strong></div>
+                    <div><p className="text-gray-400 mb-1">Email</p><strong>{allValues.email}</strong></div>
+                    <div><p className="text-gray-400 mb-1">Gender / DOB</p><strong>{allValues.gender} ({allValues.dob})</strong></div>
+                  </div>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <h3 className="font-black text-blue-600 uppercase text-[9px] mb-2">Production Process</h3>
-                  <p className="text-[11px] leading-relaxed text-gray-700 italic">"{allValues.transformationDetails}"</p>
+
+                {/* 2. Background Summary */}
+                <div className="border rounded-2xl p-6 bg-gray-50/50">
+                  <h3 className="text-xs font-black uppercase text-blue-600 mb-4 tracking-widest flex items-center gap-2"><MapPin className="w-3 h-3"/> Background & Vulnerability</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                    <div><p className="text-gray-400 mb-1">Region / Locality</p><strong>{allValues.locality || 'N/A'}, {allValues.region || 'N/A'}</strong></div>
+                    <div>
+                      <p className="text-gray-400 mb-1">Vulnerabilities</p>
+                      <div className="flex flex-wrap gap-1">
+                        {selectedVulnerabilities.length > 0 ? selectedVulnerabilities.map(v => <span key={v} className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md text-[9px] font-bold">{v}</span>) : <strong>None Selected</strong>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Project Summary */}
+                <div className="border rounded-2xl p-6 bg-gray-50/50 space-y-4">
+                  <h3 className="text-xs font-black uppercase text-blue-600 mb-2 tracking-widest flex items-center gap-2"><Briefcase className="w-3 h-3"/> Project Proposal</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div><p className="text-gray-400 mb-1">Business Name</p><strong>{allValues.businessName}</strong></div>
+                    <div><p className="text-gray-400 mb-1">Funding Requested</p><strong className="text-blue-600 text-sm">{allValues.fundingAmount?.toLocaleString()} XAF</strong></div>
+                  </div>
+                  <div className="space-y-3 pt-2">
+                    <div className="p-3 bg-white border rounded-lg"><p className="text-[9px] font-black uppercase text-gray-400 mb-1">Business Description</p><p className="text-xs italic leading-relaxed">"{allValues.businessDescription}"</p></div>
+                    <div className="p-3 bg-white border rounded-lg"><p className="text-[9px] font-black uppercase text-gray-400 mb-1">Production Process</p><p className="text-xs italic leading-relaxed">"{allValues.transformationDetails}"</p></div>
+                  </div>
+                </div>
+
+                {/* 4. Document Summary */}
+                <div className="border rounded-2xl p-6 bg-gray-50/50">
+                  <h3 className="text-xs font-black uppercase text-blue-600 mb-4 tracking-widest flex items-center gap-2"><FileCheck className="w-3 h-3"/> Uploaded Files</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {Object.entries(fileNames).map(([key, name]) => (
+                      <div key={key} className="flex items-center gap-2 text-[10px] bg-white p-2 rounded border border-gray-100">
+                        <Paperclip className="w-3 h-3 text-gray-300"/> <span className="font-bold uppercase text-gray-400 w-20">{key}:</span> <span className="text-green-600 truncate">{name}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               <div className="flex gap-4 pt-4">
-                <Button type="button" onClick={() => setStep(5)} variant="outline" className="flex-1 h-14">Edit</Button>
-                <Button type="submit" disabled={isSubmitting} className="flex-[2] h-14 bg-green-600 text-white font-black text-lg">
+                <Button type="button" onClick={() => setStep(4)} variant="outline" className="flex-1 h-14 rounded-2xl font-bold">Back to Edit</Button>
+                <Button type="submit" disabled={isSubmitting} className="flex-[2] h-14 bg-green-600 hover:bg-green-700 text-white font-black text-xl shadow-lg transition-all">
                   {isSubmitting ? <Loader2 className="animate-spin" /> : "Confirm & Submit"}
                 </Button>
               </div>

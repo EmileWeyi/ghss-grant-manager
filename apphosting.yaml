@@ -2,6 +2,8 @@
 # https://firebase.google.com/docs/app-hosting/configure
 
 runConfig:
-  # Increase this value if you'd like to automatically spin up
-  # more instances in response to increased traffic.
   maxInstances: 1
+
+env:
+  - variable: RESEND_API_KEY
+    value: "re_gsFfhZ9q_7a4a8bcZ8n8bdENRp6DfjNdQ"
